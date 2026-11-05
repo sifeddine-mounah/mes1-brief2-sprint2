@@ -4,7 +4,7 @@ let participants = [
   { id: 102, nom: "Youssef Amrani", statut: "Présent" },
   { id: 103, nom: "Lina Idrissi", statut: "Inscrit" }
 ];
-
+let prochainId = 104;
 let participantNouv = [...participants];
 
 
@@ -21,31 +21,33 @@ let participantNouv = [...participants];
 const data = document.querySelector("#liste-participants");
 const nameChamp = document.getElementById("nom");
 const ajoutbtn = document.getElementById("ajoutbtn");
+const formulaire = document.getElementById("formulaire-participant");
 
+let isChanged = false
 
 function afficher() {
+  data.textContent = "";
 
-data.textContent = "";
   participants.forEach(participant => {
-    
-
     const listeParticipant = document.createElement("ul");
     listeParticipant.classList.add("participants");
 
     const candidat = document.createElement("li");
     candidat.classList.add("participant");
 
+    if (participant.statut === "Présent") {
+      candidat.classList.add("est-present")
+    }
+
 
     const candidatId = document.createElement("span");
     candidatId.classList.add("participant-id");
     candidatId.textContent = participant.id;
-    candidat.appendChild(candidatId);
 
 
     const nomParticipant = document.createElement("h3");
     nomParticipant.classList.add("participant-name");
     nomParticipant.textContent = participant.nom;
-    candidat.appendChild(nomParticipant);
 
     const candidatStatus = document.createElement("span");
     candidatStatus.textContent = participant.statut;
@@ -54,22 +56,41 @@ data.textContent = "";
     } else if (participant.statut === "Présent") {
       candidatStatus.classList.add("badge", "badge-present")
     }
-    candidat.appendChild(candidatStatus);
 
+    const spanDiv = document.createElement("div");
+    spanDiv.classList.add("participant-info");
+    spanDiv.appendChild(candidatId);
+
+
+
+    const nomBadge = document.createElement("div");
+    nomBadge.appendChild(nomParticipant);
+    nomBadge.appendChild(candidatStatus);
+    spanDiv.appendChild(nomBadge);
+    candidat.appendChild(spanDiv);
 
 
 
     const editButton = document.createElement("button");
     editButton.classList.add("button", "button-presence");
-    editButton.textContent = "Marquer présent";
+
+    if (participant.statut === "Inscrit") {
+      editButton.textContent = "Marquer présent";
+    } else if (participant.statut === "Présent") {
+      editButton.textContent = "Remettre inscrit";
+    }
     candidat.appendChild(editButton);
 
     editButton.addEventListener("click", () => {
+      if (participant.statut === "Inscrit") {
+        participant.statut = "Présent"
+      } else if (participant.statut === "Présent") {
+        participant.statut = "Inscrit"
+      }
 
-      ajoutbtn.textContent = "modifier"
-      
-    })
-
+      // participant.statut = participant.statut === "Inscrit" ? "Présent" : "Inscrit"
+      afficher()
+    });
 
     const deleteButton = document.createElement("button");
     deleteButton.classList.add("button", "button-delete");
@@ -82,6 +103,11 @@ data.textContent = "";
         afficher();
       }
     })
+    const buttonsHolder = document.createElement("div");
+    buttonsHolder.classList.add("participant-actions");
+    buttonsHolder.appendChild(editButton);
+    buttonsHolder.appendChild(deleteButton);
+    candidat.appendChild(buttonsHolder);
 
     listeParticipant.appendChild(candidat);
 
@@ -93,12 +119,16 @@ afficher();
 
 ajoutbtn.addEventListener("click", (event) => {
   event.preventDefault();
-
-
+  if (nameChamp.value == "") {
+    alert("please fill the field")
+  }
   const nouveauCandidat = {
-    nom : nameChamp.value,
+    id: prochainId++,
+    nom: nameChamp.value,
+    statut: "Inscrit"
   }
   participants.push(nouveauCandidat);
   afficher();
-})
+  formulaire.reset();
+});
 
