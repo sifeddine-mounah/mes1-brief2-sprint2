@@ -121,6 +121,7 @@ ajoutbtn.addEventListener("click", (event) => {
   event.preventDefault();
   if (nameChamp.value == "") {
     alert("please fill the field")
+    return;
   }
   const nouveauCandidat = {
     id: prochainId++,
